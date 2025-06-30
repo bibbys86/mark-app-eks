@@ -1,6 +1,5 @@
 # db-secret 제거 및 직접 환경변수 방식으로 변경
-# --- Secret 리소스 전체 삭제
-# --- StatefulSet(Postgres) 환경변수 직접 명시
+# nginx 별도 pod로 분리된 버전
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -10,11 +9,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      app: mark-postgres
   template:
     metadata:
       labels:
-        app: postgres
+        app: mark-postgres
     spec:
       containers:
       - name: postgres
@@ -43,7 +42,7 @@ spec:
   ports:
     - port: 5432
   selector:
-    app: postgres
+    app: mark-postgres
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -53,25 +52,25 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      app: backend
+      app: mark-backend
   template:
     metadata:
       labels:
-        app: backend
+        app: mark-backend
     spec:
       containers:
       - name: backend
-        image: localhost:5000/simple-shop-backend:latest
-        imagePullPolicy: Never
+        image: ghcr.io/bibbys86/mark-app-eks/backend:main-0db8629-amd64
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
         env:
         - name: DATABASE_URL
           value: postgres://postgres:postgres@postgres:5432/simple_shop
         - name: DD_SERVICE
-          value: "simple-shop-backend"
+          value: "mark-shop-backend"
         - name: DD_ENV
-          value: "local-k8s"
+          value: "mark-shop"
         - name: DD_VERSION
           value: "1.0.0"
         - name: DD_LOGS_INJECTION
@@ -83,12 +82,13 @@ metadata:
   name: backend-service
 spec:
   selector:
-    app: backend
+    app: mark-backend
   ports:
     - protocol: TCP
       port: 3000
       targetPort: 3000
 ---
+# Frontend (정적 파일만 서빙)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -97,23 +97,23 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      app: frontend
+      app: mark-frontend
   template:
     metadata:
       labels:
-        app: frontend
+        app: mark-frontend
     spec:
       containers:
       - name: frontend
-        image: localhost:5000/simple-shop-frontend:latest
+        image: ghcr.io/bibbys86/mark-app-eks/frontend:main-0db8629-amd64
         ports:
         - containerPort: 80
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         env:
         - name: DD_SERVICE
-          value: "simple-shop-frontend"
+          value: "mark-shop-frontend"
         - name: DD_ENV
-          value: "local-k8s"
+          value: "mark-shop"
         - name: DD_VERSION
           value: "1.0.0"
         - name: DD_LOGS_INJECTION
@@ -124,30 +124,70 @@ kind: Service
 metadata:
   name: frontend-service
 spec:
-  type: NodePort
   selector:
-    app: frontend
+    app: mark-frontend
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30080
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+# Nginx Proxy (별도 Pod)
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: simple-shop-ingress
-  annotations:
-    kubernetes.io/ingress.class: traefik
+  name: nginx-proxy
 spec:
-  rules:
-    - host: simple-shop.local
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend-service
-                port:
-                  number: 80 
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mark-nginx-proxy
+  template:
+    metadata:
+      labels:
+        app: mark-nginx-proxy
+    spec:
+      containers:
+      - name: nginx-proxy
+        image: ghcr.io/bibbys86/mark-app-eks/nginx:main-0db8629-amd64
+        ports:
+        - containerPort: 80
+        imagePullPolicy: Always
+        env:
+        - name: DD_SERVICE
+          value: "mark-shop-nginx-proxy"
+        - name: DD_ENV
+          value: "mark-shop"
+        - name: DD_VERSION
+          value: "1.0.0"
+        - name: DD_LOGS_INJECTION
+          value: "true"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-proxy-service
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-name: "mark-app-eks" 
+spec:
+  type: LoadBalancer
+  selector:
+    app: mark-nginx-proxy
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+ 
