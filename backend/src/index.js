@@ -1,7 +1,7 @@
 // Initialize Datadog APM tracer first
 const tracer = require('dd-trace').init({
   service: process.env.DD_SERVICE || 'mark-shop-backend',
-  env: process.env.DD_ENV || 'local-k8s',
+  env: process.env.DD_ENV || 'mark-shop',
   version: process.env.DD_VERSION || '1.0.0',
   logInjection: true
 });

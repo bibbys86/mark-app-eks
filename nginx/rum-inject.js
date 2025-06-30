@@ -74,7 +74,7 @@
                 clientToken: 'pub54bab8eadfe4cb23ca0199e3467c24db',
                 site: 'datadoghq.com',
                 service: 'mark-shop-nginx-proxy',
-                env: 'local-k8s',
+                env: 'mark-shop',
                 version: '1.0.0',
                 sessionSampleRate: 100,
                 sessionReplaySampleRate: 100,
