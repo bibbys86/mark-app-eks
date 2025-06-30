@@ -1,12 +1,12 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: simple-shop-ingress
+  name: mark-shop-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: simple-shop.local
+      - host: mark-shop.local
     http:
       paths:
       - path: /

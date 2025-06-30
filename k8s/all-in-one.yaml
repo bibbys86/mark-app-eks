@@ -22,7 +22,7 @@ spec:
         - containerPort: 5432
         env:
         - name: POSTGRES_DB
-          value: simple_shop
+          value: mark_shop
         - name: POSTGRES_USER
           value: postgres
         - name: POSTGRES_PASSWORD
@@ -60,13 +60,13 @@ spec:
     spec:
       containers:
       - name: backend
-        image: ghcr.io/bibbys86/mark-app-eks/backend:main-0db8629-amd64
+        image: ghcr.io/bibbys86/mark-app-eks/backend:main-075ebc6-amd64
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
         env:
         - name: DATABASE_URL
-          value: postgres://postgres:postgres@postgres:5432/simple_shop
+          value: postgres://postgres:postgres@postgres:5432/mark_shop
         - name: DD_SERVICE
           value: "mark-shop-backend"
         - name: DD_ENV
@@ -105,7 +105,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ghcr.io/bibbys86/mark-app-eks/frontend:main-0db8629-amd64
+        image: ghcr.io/bibbys86/mark-app-eks/frontend:main-075ebc6-amd64
         ports:
         - containerPort: 80
         imagePullPolicy: Always
@@ -148,7 +148,7 @@ spec:
     spec:
       containers:
       - name: nginx-proxy
-        image: ghcr.io/bibbys86/mark-app-eks/nginx:main-0db8629-amd64
+        image: ghcr.io/bibbys86/mark-app-eks/nginx:main-075ebc6-amd64
         ports:
         - containerPort: 80
         imagePullPolicy: Always

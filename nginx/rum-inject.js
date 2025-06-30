@@ -97,7 +97,7 @@
                     window.location.origin,
                     // 백엔드 API 호출
                     /^http:\/\/localhost:30080\/api\/.*$/,
-                    /^http:\/\/simple-shop\.local\/api\/.*$/,
+                    /^http:\/\/mark-shop\.local\/api\/.*$/,
                     // 내부 서비스 호출
                     'http://backend-service:3000',
                     'http://frontend-service',
@@ -110,7 +110,7 @@
                 // 이 설정으로 RUM이 APM traces와 연결됩니다
                 firstPartyHosts: [
                     'localhost:30080',
-                    'simple-shop.local',
+                    'mark-shop.local',
                     'backend-service:3000',
                     'frontend-service'
                 ]

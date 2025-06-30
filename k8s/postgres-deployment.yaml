@@ -20,7 +20,7 @@ spec:
         - containerPort: 5432
         env:
         - name: POSTGRES_DB
-          value: simple_shop
+          value: mark_shop
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:

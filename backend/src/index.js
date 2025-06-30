@@ -61,7 +61,7 @@ app.use(morgan(':custom-json', {
 }));
 
 // Database connection
-const sequelize = new Sequelize(process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/simple_shop', {
+const sequelize = new Sequelize(process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/mark_shop', {
   dialect: 'postgres',
   logging: (msg) => logger.debug(msg)
 });

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: localhost:5000/simple-shop-backend:latest
+        image: localhost:5000/mark-shop-backend:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 3000
