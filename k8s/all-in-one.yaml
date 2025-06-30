@@ -60,7 +60,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: ghcr.io/bibbys86/mark-app-eks/backend:main-075ebc6-amd64
+        image: ghcr.io/bibbys86/mark-app-eks/backend:main-amd64
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
@@ -105,7 +105,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ghcr.io/bibbys86/mark-app-eks/frontend:main-075ebc6-amd64
+        image: ghcr.io/bibbys86/mark-app-eks/frontend:main-amd64
         ports:
         - containerPort: 80
         imagePullPolicy: Always
@@ -148,7 +148,7 @@ spec:
     spec:
       containers:
       - name: nginx-proxy
-        image: ghcr.io/bibbys86/mark-app-eks/nginx:main-075ebc6-amd64
+        image: ghcr.io/bibbys86/mark-app-eks/nginx:main-amd64
         ports:
         - containerPort: 80
         imagePullPolicy: Always
